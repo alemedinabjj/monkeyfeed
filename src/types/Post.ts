@@ -11,6 +11,6 @@ export interface PostProps {
 }
 
 export interface Content { 
-  type: 'paragraph' | 'link'
+  type: string
   content: string
 }

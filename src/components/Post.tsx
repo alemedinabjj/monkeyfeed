@@ -67,7 +67,7 @@ export function Post({ author, content, publishedAt }: PostProps) {
 
       <div className={styles.content}>
         {content.map(line => (
-          line.type === 'link' ? ( <a key={line.content} href={line.content}>{line.content}</a> ) : ( <p key={line.content}>{line.content}</p> )
+          line?.type === 'link' ? ( <a key={line?.content} href={line?.content}>{line?.content}</a> ) : ( <p key={line?.content}>{line?.content}</p> )
         ))}
       </div>
 
