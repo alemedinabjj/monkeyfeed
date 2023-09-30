@@ -5,18 +5,51 @@ import { format, formatDistanceToNow } from 'date-fns'
 import { ptBR  } from 'date-fns/locale'
 import { useState, FormEvent, ChangeEvent } from 'react'
 import { PostProps } from '../types/Post'
+import { useMutation, useQueryClient } from 'react-query'
+import { api } from '../lib/api'
+import { ThumbsUp, Trash } from 'phosphor-react'
 
-export function Post({ author, content, publishedAt }: PostProps) {
-  const [comments, setComments] = useState([
-    'Post muito bacana hein ?!',
-  ]);
+export function Post({ author, content, createdAt, id, comments }: PostProps) {
+ 
+  console.log(comments)
+
+  const queryClient = useQueryClient()
+
+  const { mutateAsync } = useMutation(async (idPost) => {
+    const response = await api.delete(`/posts/post/${idPost}`)
+
+    return response.data
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('posts')
+    }
+  })
+
+  const { mutateAsync: commentMutate } = useMutation(async (idPost) => {
+    const response = await api.post(`/posts/post/${idPost}/comments`, {
+      content: newCommentText
+    })
+
+    return response.data
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('posts')
+    }
+  })
+
+  const { mutateAsync: commentDelete } = useMutation(async ({ idPost, idComment }: any) => {
+    const response = await api.delete(`/posts/post/${idPost}/comments/${idComment}`)
+
+    return response.data
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('posts')
+    }
+  })
+  
 
   const [newCommentText, setNewCommentText] = useState('');
 
-  const publishedDateFormatted = format(publishedAt,
-     "dd 'de' MMMM 'às' HH:mm",
-      { locale: ptBR }
-  )
 
   const isNewCommentEmpty = newCommentText === '' ? `${styles.buttonDisabled}` : `${styles.buttonEnabled}`
 
@@ -25,10 +58,10 @@ export function Post({ author, content, publishedAt }: PostProps) {
     setNewCommentText(e.target.value);
   }
 
-  function handleCreateNewComment(e: FormEvent) {
+  async function handleCreateNewComment(e: FormEvent) {
     e.preventDefault()
 
-    setComments([...comments, newCommentText])
+    await commentMutate(id as any)
     console.log(comments)
     setNewCommentText('')
   }
@@ -37,38 +70,50 @@ export function Post({ author, content, publishedAt }: PostProps) {
     e.target.setCustomValidity('Por favor, preencha este campo')
   }
 
-  function deleteComment(comment: string) {
-    setComments([...comments.filter(c => c !== comment)])
+  async function deleteComment(idComment: string) {
+    await commentDelete({ idPost: id, idComment: idComment })
   }
 
-  const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
+  async function deletePost() {
+    await mutateAsync(id as any)
+  }
+
+  const publishedDateFormatted = format(new Date(createdAt),
+    "dd 'de' MMMM 'às' HH:mm",
+     { locale: ptBR }
+ )
+
+  const publishedDateRelativeToNow = formatDistanceToNow(new Date(createdAt), {
     locale: ptBR,
     addSuffix: true
   })
 
   return (
     <article className={styles.post}>
+      <button onClick={deletePost} title="Deletar comentário">
+        <Trash size={24} />
+      </button>
       <header>
         <div className={styles.author}>
           <Avatar 
             src={author.avatar_url}
           />
           <div className={styles.authorInfo}>
-            <strong>{author.name}</strong>
-            <span>{author.role}</span>
+            <strong>{author.username}</strong>
+            {/* <span>{author.role}</span> */}
           </div>
         </div>
 
-        <time title={publishedDateFormatted} dateTime={publishedAt.toISOString()}>
-          {publishedDateRelativeToNow}
-        </time>
+        {createdAt && (
+          <time title={publishedDateFormatted} dateTime={new Date(createdAt).toISOString()}>
+            {publishedDateRelativeToNow}
+          </time>
+        )}
       </header>
 
 
       <div className={styles.content}>
-        {content.map(line => (
-          line?.type === 'link' ? ( <a key={line?.content} href={line?.content}>{line?.content}</a> ) : ( <p key={line?.content}>{line?.content}</p> )
-        ))}
+        {content}
       </div>
 
 
@@ -93,10 +138,12 @@ export function Post({ author, content, publishedAt }: PostProps) {
       </form>
 
       <div className={styles.commentList}>
-        {comments.map(comment => (
-          <Comment deleteComment={deleteComment} content={comment} key={comment} />
+        {comments.map((comment: any) => (
+          <Comment deleteComment={deleteComment} content={comment.content} key={comment.id} {...comment} />
         ))}
       </div>
+
+
     </article>
   )
 }

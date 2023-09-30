@@ -1,13 +1,15 @@
 export interface Author {
-  name: string
+  username: string
   avatar_url: string
   role: string
 }
 
 export interface PostProps {
   author: Author;
-  publishedAt: Date;
-  content: Content[];
+  createdAt: Date;
+  content: string
+  id: string
+  comments: Comment[]
 }
 
 export interface Content { 
