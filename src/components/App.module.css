@@ -18,3 +18,19 @@
     grid-template-columns: 1fr;
   }
 }
+
+.loader {
+  border: 5px solid var(--gray-700);
+  border-top: 5px solid var(--gold-300); 
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  animation: spin 2s linear infinite;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

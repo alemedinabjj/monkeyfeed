@@ -38,6 +38,10 @@
   border-top: 1px solid var(--gray-600);
   margin-top: 1.5rem;
   padding: 1.5rem 2rem 2rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .sidebar footer a {
@@ -59,10 +63,35 @@
   gap: 0.5rem;
 
   transition: all 0.1s ease-in-out;
+}
 
+.sidebar footer a:nth-child(2) {
+  width: 100%;
+  background: transparent;
+  color: #e0245e;
+  text-decoration: none;
+  border: 1px solid #e0245e;
+  border-radius: 8px;
+  height: 50px;
+  padding: 0 1.5rem;
+  font-weight: bold;
+  display: block;
+  text-align: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  transition: all 0.1s ease-in-out;
 }
 
 .sidebar footer a:hover {
   background: var(--gold-500);
+  color: var(--gray-900);
+}
+
+.sidebar footer a:hover:nth-child(2) {
+  background: #e0245e;
   color: var(--gray-900);
 }

@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { api } from '../lib/api';
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../hooks/useAuth';
 
 const schemaLogin = yup.object().shape({
   email: yup.string().email('E-mail inválido').required('E-mail obrigatório'),
@@ -19,24 +20,13 @@ export function Login() {
   const { handleSubmit, register, formState: { errors } } = useForm({
     resolver: yupResolver(schemaLogin)
   })
+  
+  const { login } = useAuth()
 
   const navigate = useNavigate();
 
   const handleLoginData: SubmitHandler<LoginData> = async (data) => {
-    console.log(data)
-    const response = await api.post('/auth/login', data)
-
-    const { token } = response.data
-
-    if (token) {
-      localStorage.setItem('@token-monkey', token)
-      navigate('/')
-      return 
-    }
-
-    
-    console.log(response)
-
+    login(data)
   }
 
   return (

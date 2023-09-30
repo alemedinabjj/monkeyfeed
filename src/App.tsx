@@ -5,15 +5,17 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Login } from "./components/Login"
+import { AuthProvider } from "./contexts/AuthProvider"
 
 
 
 
 export function App() {
   const queryClient = new QueryClient()
+  const token = localStorage.getItem('@token-monkey')
 
   return (
-    <>
+    <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Routes>
@@ -22,7 +24,7 @@ export function App() {
           </Routes>
         </BrowserRouter>
       </QueryClientProvider>
-    </>
+    </AuthProvider>
   )
 }
 

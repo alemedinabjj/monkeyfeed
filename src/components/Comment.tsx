@@ -6,9 +6,11 @@ import { CommentProps } from '../types/Comment'
 import styles from './Comment.module.css'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useAuth } from '../hooks/useAuth'
 
 
-export function Comment ({ content, deleteComment, createdAt, author, id }: any) {
+export function Comment ({ content, deleteComment, createdAt, author, id, authorId }: any) {
+  const { user } = useAuth()
 
   const [likeCount, setLikeCount] = useState(0)
 
@@ -24,10 +26,9 @@ export function Comment ({ content, deleteComment, createdAt, author, id }: any)
     locale: ptBR,
     addSuffix: true
   })
-
   return (
     <div className={styles.comment}>
-      <Avatar hasBorder={false} src="https://github.com/alemedinabjj.png" alt="" />
+      <Avatar hasBorder={false} name={author.username} />
       <div className={styles.commentBox}>
         <div className={styles.commentContent}>
           <header>
@@ -39,9 +40,13 @@ export function Comment ({ content, deleteComment, createdAt, author, id }: any)
                 </span>
               </time>
             </div>
-            <button onClick={handleDeleteComment} title="Deletar comentário">
-              <Trash size={24} />
-            </button>
+            {
+              user?.id === authorId && (
+                <button onClick={handleDeleteComment} title="Deletar comentário">
+                  <Trash size={24} />
+                </button>
+              )
+            }
           </header>
           <p>
             {content}

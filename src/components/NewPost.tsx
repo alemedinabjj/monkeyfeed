@@ -33,7 +33,6 @@ export function NewPost() {
   })
 
   const onSubmit: SubmitHandler<NewPostProps> = async (data) => {
-    console.log(data)
 
     await mutateAsync(data as any)
   }

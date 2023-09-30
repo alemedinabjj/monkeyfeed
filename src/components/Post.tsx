@@ -8,11 +8,10 @@ import { PostProps } from '../types/Post'
 import { useMutation, useQueryClient } from 'react-query'
 import { api } from '../lib/api'
 import { ThumbsUp, Trash } from 'phosphor-react'
+import { useAuth } from '../hooks/useAuth'
 
-export function Post({ author, content, createdAt, id, comments }: PostProps) {
- 
-  console.log(comments)
-
+export function Post({ author, content, createdAt, id, comments, authorId }: PostProps) {
+  const { user } = useAuth()
   const queryClient = useQueryClient()
 
   const { mutateAsync } = useMutation(async (idPost) => {
@@ -24,6 +23,7 @@ export function Post({ author, content, createdAt, id, comments }: PostProps) {
       queryClient.invalidateQueries('posts')
     }
   })
+
 
   const { mutateAsync: commentMutate } = useMutation(async (idPost) => {
     const response = await api.post(`/posts/post/${idPost}/comments`, {
@@ -62,7 +62,6 @@ export function Post({ author, content, createdAt, id, comments }: PostProps) {
     e.preventDefault()
 
     await commentMutate(id as any)
-    console.log(comments)
     setNewCommentText('')
   }
 
@@ -88,15 +87,20 @@ export function Post({ author, content, createdAt, id, comments }: PostProps) {
     addSuffix: true
   })
 
+
+
   return (
     <article className={styles.post}>
-      <button onClick={deletePost} title="Deletar comentário">
-        <Trash size={24} />
-      </button>
+      {user?.id === authorId && (
+        <button onClick={deletePost} title="Deletar comentário">
+          <Trash size={24} />
+        </button>
+      )}
+
       <header>
         <div className={styles.author}>
           <Avatar 
-            src={author.avatar_url}
+            name={author.username}
           />
           <div className={styles.authorInfo}>
             <strong>{author.username}</strong>
